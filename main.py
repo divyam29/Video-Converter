@@ -13,8 +13,8 @@ app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=465,
     MAIL_USE_SSL=True,
-    MAIL_USERNAME="divyamjain2907@gmail.com",
-    MAIL_PASSWORD="mindtree"
+    MAIL_USERNAME="aaabb29072002@gmail.com",
+    MAIL_PASSWORD="ab@12345"
 )
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/opencv'
@@ -48,7 +48,7 @@ def home():
         db.session.commit()
 
         msg = Message(subject=filename, sender="divyamjain2907@gmail.com",
-                      recipients=[email], body="Your file has been uploaded successfully\nFile Size: " + str(filesize/1000) + " KBs")
+                      recipients=[email], body="Your file has been uploaded successfully\nFile Size: " + str(filesize/1025.14) + " KBs")
         with app.open_resource("static/uploads/" + filename) as fp:
             msg.attach(filename, "image/png", fp.read())
             mail.send(msg)
