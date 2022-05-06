@@ -3,12 +3,24 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
+app.secret_key = 'super-secret-key'
 db = SQLAlchemy(app)
+
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=465,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME="divyamjain2907@gmail.com",
+    MAIL_PASSWORD="mindtree"
+)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/opencv'
 app.config['UPLOAD_FOLDER'] = 'D:/Projects/open cv/Rana Sir project/static/uploads'
+
+mail = Mail(app)
 
 
 class File(db.Model):
@@ -18,7 +30,7 @@ class File(db.Model):
     filename = db.Column(db.String(80), nullable=False)
 
 
-@app.route("/",methods=['GET','POST'])
+@app.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
         file = request.files['file']
@@ -26,14 +38,20 @@ def home():
         file.save(os.path.join(
             app.config['UPLOAD_FOLDER'], filename
         ))
-        # flash(filename)
 
         email = request.form.get("email")
-        filesize = request.form.get("filesize")
+        filesize = os.path.getsize("static/uploads/" + filename)
 
-        entry = File(date=datetime.now(), email=email, size=filesize, filename=filename)
+        entry = File(date=datetime.now(), email=email,
+                     size=filesize, filename=filename)
         db.session.add(entry)
         db.session.commit()
+
+        msg = Message(subject=filename, sender="divyamjain2907@gmail.com",
+                      recipients=[email], body="Your file has been uploaded successfully\nFile Size: " + str(filesize/1000) + " KBs")
+        with app.open_resource("static/uploads/" + filename) as fp:
+            msg.attach(filename, "image/png", fp.read())
+            mail.send(msg)
 
     return render_template("index.html")
 
