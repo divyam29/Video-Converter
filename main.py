@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template, request, flash
+from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
@@ -7,7 +7,6 @@ from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.secret_key = 'super-secret-key'
-db = SQLAlchemy(app)
 
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -17,8 +16,15 @@ app.config.update(
     MAIL_PASSWORD="ab@12345"
 )
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/opencv'
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/opencv'
+app.config['SQLALCHEMY_DATABASE_URI'] =\
+    'sqlite:///' + os.path.join(basedir, 'database.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'D:/Projects/open cv/Rana Sir project/static/uploads'
+
+db = SQLAlchemy(app)
 
 mail = Mail(app)
 
