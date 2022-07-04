@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
-from flask_mail import Mail
+from flask_mail import Mail,Message
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from google_drive_downloader import GoogleDriveDownloader as gdd
@@ -17,7 +17,7 @@ app.config.update(
     MAIL_PORT=465,
     MAIL_USE_SSL=True,
     MAIL_USERNAME="aaabb29072002@gmail.com",
-    MAIL_PASSWORD="ab@12345"
+    MAIL_PASSWORD="kbhicbsdwympyexp"
 )
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -27,7 +27,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-upload_dir=os.path.join(os.getcwd(),'static/uploads').replace(os.sep,'/')
+upload_dir = os.path.join(os.getcwd(), 'static/uploads').replace(os.sep, '/')
 app.config['UPLOAD_FOLDER'] = upload_dir
 
 db = SQLAlchemy(app)
@@ -62,14 +62,15 @@ def home():
         db.session.add(entry)
         db.session.commit()
 
-        # msg = Message(subject=filename, sender="aaabb29072002@gmail.com",
-        #               recipients=[email], body="Your file has been uploaded successfully\nFile Size: " + str(filesize/1025.14) + " KBs")
-        # with app.open_resource("static/uploads/" + filename) as fp:
-        #     msg.attach(filename, "image/png", fp.read())
-        #     mail.send(msg)
+        msg = Message(subject=filename, sender="aaabb29072002@gmail.com",
+                      recipients=[email], body="Your file has been uploaded successfully\nFile Size: " + str(filesize/1025.14) + " KBs")
+        with app.open_resource("static/uploads/" + filename) as fp:
+            msg.attach(filename, "image/png", fp.read())
+            mail.send(msg)
 
         upload_file_list = [filename]
         for upload_file in upload_file_list:
+            
             gfile = drive.CreateFile(
                 {'parents': [{'id': '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u'}]})
             # Read file and set it as the content of this instance.
@@ -81,6 +82,7 @@ def home():
         for file in file_list:
             if file['title'] == "static/uploads/"+filename:
                 file_id = file['id']
+
                 print(file['title']+" : "+file['id'])
 
             print('title: %s, id: %s' % (file['title'], file['id']))
