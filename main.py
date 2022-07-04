@@ -70,7 +70,7 @@ def home():
 
         upload_file_list = [filename]
         for upload_file in upload_file_list:
-            
+        
             gfile = drive.CreateFile(
                 {'parents': [{'id': '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u'}]})
             # Read file and set it as the content of this instance.
