@@ -8,6 +8,7 @@ from flask_mail import Mail,Message
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from google_drive_downloader import GoogleDriveDownloader as gdd
+from grayscale import convert_to_grayscale
 
 app = Flask(__name__)
 app.secret_key = 'super-secret-key'
@@ -24,7 +25,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/opencv'
 app.config['SQLALCHEMY_DATABASE_URI'] =\
-    'sqlite:///' + os.path.join(basedir, 'database.db')
+    'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 upload_dir = os.path.join(os.getcwd(), 'static/uploads').replace(os.sep, '/')
@@ -57,6 +58,8 @@ def home():
         email = request.form.get("email")
         filesize = os.path.getsize("static/uploads/" + filename)
 
+        convert_to_grayscale(filename)
+        
         entry = File(date=datetime.now(), email=email,
                      size=filesize, filename=filename)
         db.session.add(entry)
@@ -64,7 +67,7 @@ def home():
 
         msg = Message(subject=filename, sender="aaabb29072002@gmail.com",
                       recipients=[email], body="Your file has been uploaded successfully\nFile Size: " + str(filesize/1025.14) + " KBs")
-        with app.open_resource("static/uploads/" + filename) as fp:
+        with app.open_resource("static/modified/" + filename) as fp:
             msg.attach(filename, "image/png", fp.read())
             mail.send(msg)
 
@@ -74,13 +77,13 @@ def home():
             gfile = drive.CreateFile(
                 {'parents': [{'id': '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u'}]})
             # Read file and set it as the content of this instance.
-            gfile.SetContentFile("static/uploads/" + upload_file)
+            gfile.SetContentFile("static/modified/" + upload_file)
             gfile.Upload()  # Upload the file.
 
         file_list = drive.ListFile({'q': "'{}' in parents and trashed=false".format(
             '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u')}).GetList()
         for file in file_list:
-            if file['title'] == "static/uploads/"+filename:
+            if file['title'] == "static/modified/"+filename:
                 file_id = file['id']
 
                 print(file['title']+" : "+file['id'])
@@ -89,5 +92,5 @@ def home():
 
     return render_template("index.html")
 
-
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
