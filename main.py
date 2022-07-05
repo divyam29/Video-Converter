@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
-from flask_mail import Mail,Message
+from flask_mail import Mail, Message
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from google_drive_downloader import GoogleDriveDownloader as gdd
@@ -56,24 +56,18 @@ def home():
         ))
 
         email = request.form.get("email")
-        filesize = os.path.getsize("static/uploads/" + filename)
-
+        
         convert_to_grayscale(filename)
         
+        filesize = os.path.getsize("static/modified/" + filename)
         entry = File(date=datetime.now(), email=email,
                      size=filesize, filename=filename)
         db.session.add(entry)
         db.session.commit()
 
-        msg = Message(subject=filename, sender="aaabb29072002@gmail.com",
-                      recipients=[email], body="Your file has been uploaded successfully\nFile Size: " + str(filesize/1025.14) + " KBs")
-        with app.open_resource("static/modified/" + filename) as fp:
-            msg.attach(filename, "image/png", fp.read())
-            mail.send(msg)
-
         upload_file_list = [filename]
         for upload_file in upload_file_list:
-        
+
             gfile = drive.CreateFile(
                 {'parents': [{'id': '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u'}]})
             # Read file and set it as the content of this instance.
@@ -82,15 +76,22 @@ def home():
 
         file_list = drive.ListFile({'q': "'{}' in parents and trashed=false".format(
             '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u')}).GetList()
+        print()
         for file in file_list:
             if file['title'] == "static/modified/"+filename:
-                file_id = file['id']
-
                 print(file['title']+" : "+file['id'])
-
+                file_id=file['id']
             print('title: %s, id: %s' % (file['title'], file['id']))
+        print()
+
+        msg = Message(subject="Here is your edited file", sender="aaabb29072002@gmail.com",
+                      recipients=[email], body=f'Your file has been uploaded successfully\nFile Size: {str(round(filesize/1025140,2))} MBs\nHere is the link to your file:\nhttps://drive.google.com/file/d/{file_id}/view')
+        # with app.open_resource("static/modified/" + filename) as fp:
+        #     msg.attach(filename, "image/png", fp.read())
+        mail.send(msg)
 
     return render_template("index.html")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
