@@ -1,7 +1,7 @@
-div#loading {
-    width: 35px;
-    height: 35px;
+#loading {
+    width: 64px;
+    height: 64px;
     display: none;
-    background: url(__Iphone-spinner-1.gif) no-repeat;
+    background: url(loading.gif) no-repeat;
     cursor: wait;
     }

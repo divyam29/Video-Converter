@@ -44,9 +44,12 @@ class File(db.Model):
     size = db.Column(db.Float, nullable=False)
     filename = db.Column(db.String(80), nullable=False)
 
-
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/")
 def home():
+    return render_template('index.html')
+
+@app.route("/upload", methods=['GET', 'POST'])
+def upload():
     if request.method == 'POST':
         file = request.files['file']
         filename = secure_filename(file.filename)
