@@ -9,6 +9,7 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from google_drive_downloader import GoogleDriveDownloader as gdd
 from grayscale import convert_to_grayscale
+from movie import *
 
 app = Flask(__name__)
 app.secret_key = 'super-secret-key'
@@ -60,7 +61,7 @@ def upload():
 
         email = request.form.get("email")
         
-        convert_to_grayscale(filename)
+        edit_video(filename)
         
         filesize = os.path.getsize("static/modified/" + filename)
         entry = File(date=datetime.now(), email=email,
