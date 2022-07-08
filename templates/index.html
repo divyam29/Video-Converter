@@ -9,18 +9,18 @@
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static',filename= 'styles.css')}}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <title>Upload File</title>
+    <title>Video Converter</title>
 </head>
 
 <body>
     <script type="text/javascript">// <![CDATA[
         function loading() {
             $("#loading").show();
-            $("#content").hide();       
+            $("#content").hide();
         }
 // ]]></script>
-    <div class="container my-5 mx-5">
-        <form action="/upload" onsubmit="loading();" name="file" method="POST" enctype="multipart/form-data">
+    <div class="container my-5 mx-5 d-flex justify-content-center">
+        <form action="/upload" onsubmit="loading();" name="file" method="POST" enctype="multipart/form-data" class="w-75">
             <h1>Upload a video:</h1>
             <div class="form-group my-3">
                 <label for="email">Email address:</label>
@@ -28,11 +28,27 @@
                     placeholder="Enter email" required>
             </div>
 
-            <div class="form-group my-3">
-                <label for="File">Upload Video</label>
-                <br>
-                <input type="file" class="form-control-file" id="File" name="file" required>
+            <div class="form-check form-switch form-check-inline">
+                <input class="form-check-input" type="checkbox" role="switch" id="resize" value="True" name="resize">
+                <label class="form-check-label" for="resize">Resize Video</label>
             </div>
+
+            <div class="form-check form-switch form-check-inline">
+                <input class="form-check-input" type="checkbox" role="switch" id="grayscale" value='True'
+                    name="grayscale">
+                <label class="form-check-label" for="grayscale" value='True'>Change to Grayscale</label>
+            </div>
+
+            <div class="my-3">
+                <!-- <label for="File" class="form-label">Upload Video</label> -->
+                <input class="form-control" type="file" id="File" name="file" required>
+            </div>
+
+            <!-- <div class="form-group my-3">
+                <label for="File"></label>
+                <br>
+                <input type="file" class="form-control-file" id="File" >
+            </div> -->
 
             <button id="content" type="submit" class="btn btn-primary my-2">Submit</button>
             <div id="loading">

@@ -1,7 +1,7 @@
 # importing the module
 import cv2
 
-def convert_to_grayscale(filename):
+def convert_to_grayscale(filename,resize,grayscale):
     # reading the video
     source = cv2.VideoCapture(f'static/uploads/{filename}')
     height = int(source.get(cv2.CAP_PROP_FRAME_HEIGHT))

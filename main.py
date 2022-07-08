@@ -60,29 +60,28 @@ def upload():
         ))
 
         email = request.form.get("email")
+        resize = request.form.get("resize")
+        grayscale = request.form.get("grayscale")
+
+        modified_file=edit_video(filename,resize,grayscale)
         
-        edit_video(filename)
-        
-        filesize = os.path.getsize("static/modified/" + filename)
+        filesize = os.path.getsize(modified_file)
         entry = File(date=datetime.now(), email=email,
                      size=filesize, filename=filename)
         db.session.add(entry)
         db.session.commit()
 
-        upload_file_list = [filename]
-        for upload_file in upload_file_list:
-
-            gfile = drive.CreateFile(
-                {'parents': [{'id': '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u'}]})
-            # Read file and set it as the content of this instance.
-            gfile.SetContentFile("static/modified/" + upload_file)
-            gfile.Upload()  # Upload the file.
+        gfile = drive.CreateFile(
+            {'parents': [{'id': '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u'}]})
+        # Read file and set it as the content of this instance.
+        gfile.SetContentFile(modified_file)
+        gfile.Upload()  # Upload the file.
 
         file_list = drive.ListFile({'q': "'{}' in parents and trashed=false".format(
             '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u')}).GetList()
         print()
         for file in file_list:
-            if file['title'] == "static/modified/"+filename:
+            if file['title'] == modified_file:
                 print(file['title']+" : "+file['id'])
                 file_id=file['id']
             print('title: %s, id: %s' % (file['title'], file['id']))
