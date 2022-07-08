@@ -1,4 +1,3 @@
-from distutils.command.upload import upload
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -7,7 +6,6 @@ from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-from google_drive_downloader import GoogleDriveDownloader as gdd
 from grayscale import convert_to_grayscale
 from movie import *
 
@@ -79,13 +77,14 @@ def upload():
 
         file_list = drive.ListFile({'q': "'{}' in parents and trashed=false".format(
             '1gB6cfJFNvWwS9CT3_c4KLpDIjvkU8g2u')}).GetList()
-        print()
+        # print()
         for file in file_list:
             if file['title'] == modified_file:
-                print(file['title']+" : "+file['id'])
+                # print(file['title']+" : "+file['id'])
                 file_id=file['id']
-            print('title: %s, id: %s' % (file['title'], file['id']))
-        print()
+                break
+            # print('title: %s, id: %s' % (file['title'], file['id']))
+        # print()
 
         msg = Message(subject="Here is your edited file", sender="aaabb29072002@gmail.com",
                       recipients=[email], body=f'Your file has been uploaded successfully\nFile Size: {str(round(filesize/1025140,2))} MBs\nHere is the link to your file:\nhttps://drive.google.com/file/d/{file_id}/view')
